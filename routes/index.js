@@ -1,24 +1,25 @@
-const { Body } = require('@nestjs/common');
 var express = require('express');
 const { connect } = require('http2');
 var router = express.Router();
-const db = require('mysql')
+const db = require('mysql');
 
+// const { add_todo_list } = require("../public/javascripts/add_todo_list");
 
 router.use(express.json());
 
-
+// 미들웨어
 const loggingMiddleware = (req , res, next)=>{
   console.log(`${req.method} 이것이-미들 ${req.url} 웨어`);
   next();
 }
 
 
+// 
 const resolveIndexByUserId = (req,res, next)=> {
   const {
     body,
-    params: {id},
-  } = req;
+    params: {id} } = req;
+
   const parsedId = parseInt(id);
   if(isNot(parsedId)) return res.sendStatus(400);
   const findUserIndex = mockUsers.findIndex((user)=> user.is === parsedId);
@@ -27,6 +28,8 @@ const resolveIndexByUserId = (req,res, next)=> {
   next(new Error);
 };
 
+
+//  async 와 sync 의 사용
 let text = "default";
 const data = require("fs").readFileSync("./public/test.txt",{encoding:"utf-8"});
 const data22 = require("fs").readFile("./public/test.txt",{encoding:"utf-8"},(err,data)=>{
@@ -48,21 +51,9 @@ router.use(
 );
 
 
-const mockProducts = [
-  {id : 123 , productName: "Tool", price: 12},
-  {id : 124 , productName: "Pensil",price: 500},
-  {id : 125 , productName: "Gum", price: 3},
-];
-
-const mockUsers = [
-  {id : 1 , username: "kunwoong", displayName: "Moon"},
-  {id : 2 , username: "sam", displayName: "Steven"},
-  {id : 3 , username: "kebin", displayName: "Issac"},
-];
-
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.render('index', { title: '어서와 todoList에..' });
 });
 
 
@@ -93,16 +84,20 @@ router.get(
   }
 );
 
+// ------- api--------
+
+router.get('/todolist', (req, res, next) => {
+  res.render('todoList');
+});
 
 
-
-router.get('/api/products', resolveIndexByUserId,(req , res) => {
-  res.send(mockProducts);
+router.get('/getAllList', resolveIndexByUserId,(req , res) => {
+  res.send(db.escapeId());
 });
 
 
 
-router.get('/api/users/:id', resolveIndexByUserId ,(req,res)=>{
+router.get('/createTodo', resolveIndexByUserId ,(req,res)=>{
   console.log(req.params);
   const parsedId = parseInt(req.params.id);
   console.log(parsedId);
@@ -118,10 +113,17 @@ router.get('/api/users/:id', resolveIndexByUserId ,(req,res)=>{
 });
 
 
-router.post('/p', (req, res) => {
+router.post('/addWork', (req, res) => {
+  const newWork = req.body.newWork;
+  works.push(newWork);
+  res.redirect('/');
+});
+
+
+router.post('/createTodo', (req, res) => {
   res.send('Got a POST request');
   var body = req.body;
-  var sql = "insert user set id=?, username=?, password=? where bnum="
+  var sql = "insert user set id=?, work=? where bnum="
   connect.query(sql, (err,result)=>{
     sql.get(res.params());
   })

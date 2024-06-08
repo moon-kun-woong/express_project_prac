@@ -1,0 +1,25 @@
+doctype html
+html(lang="en")
+  head
+    link(rel="stylesheet", href="//cdn.jsdelivr.net/npm/xeicon@2.3.3/xeicon.min.css")
+    meta(charset="UTF-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Todolist
+    link(rel="stylesheet", href="/stylesheets/todoList.css")
+
+  body
+    .wrapper
+      header TodoList
+      .inputField
+        input(type="text", id="addValue", placeholder="할 일 추가하기", autofocus=true)
+        button(type="button", id="btn", onclick="addWork()")
+          i.xi-plus.xi-2x
+      div
+        ul#addWork.Todolist
+          li
+            div#result
+            
+      .footer
+        button(type="button", id="allClear", onclick="allClearList()") 모두 삭제
+    script(src="/javascripts/add_todo_list.js")
