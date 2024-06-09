@@ -2,10 +2,14 @@ var express = require('express');
 const { connect } = require('http2');
 var router = express.Router();
 const db = require('mysql');
+const bodyParser = require('body-parser');
+const { error } = require('console');
+
 
 // const { add_todo_list } = require("../public/javascripts/add_todo_list");
 
 router.use(express.json());
+router.use(bodyParser.json());
 
 // 미들웨어
 const loggingMiddleware = (req , res, next)=>{
@@ -43,7 +47,7 @@ router.use((err, req, res, next) => {
 
 
 router.use(
-  loggingMiddleware, 
+  loggingMiddleware,
   (res,req,next)=>{
     console.log("Finished Logging...---------");
     next();
@@ -57,84 +61,50 @@ router.get('/', function(req, res, next) {
 });
 
 
-
-router.get(
-  '/api/users', 
-  (req, res, next)=>{
-    console.log('Base URL1');
-    next();
-  },
-  (req, res, next)=>{
-    console.log('Base URL2');
-    next();
-  },
-  (req, res, next)=>{
-    console.log(data22);
-    next();
-  },
-  (req , res, next) => {
-    console.log(req.query)
-    const {query: {filter, value}} = req;
-
-    if(!filter && !value) return res.send(mockUsers);
-    
-    if(filter && value) return res.send(
-      mockUsers.filter((user)=> user[filter].inclues(value))
-    );
-  }
-);
-
-// ------- api--------
-
-router.get('/todolist', (req, res, next) => {
-  res.render('todoList');
-});
-
-
-router.get('/getAllList', resolveIndexByUserId,(req , res) => {
-  res.send(db.escapeId());
-});
-
-
-
-router.get('/createTodo', resolveIndexByUserId ,(req,res)=>{
-  console.log(req.params);
-  const parsedId = parseInt(req.params.id);
-  console.log(parsedId);
-
-  if(isNotInt(parsedId)) 
-    return res.status(400).send({msg: "Bad Resquest. Invalid Id."
-  });
-  
-  const findUser = mockUsers.find((user) => user.id === parsedId);
-
-  if(!findUser) return res.sendStatus(404);
-  return res.send(findUser);
-});
-
-
-router.post('/addWork', (req, res) => {
-  const newWork = req.body.newWork;
-  works.push(newWork);
-  res.redirect('/');
-});
-
-
-router.post('/createTodo', (req, res) => {
-  res.send('Got a POST request');
-  var body = req.body;
-  var sql = "insert user set id=?, work=? where bnum="
-  connect.query(sql, (err,result)=>{
-    sql.get(res.params());
+router.get('/cats', (req, res, next) => {
+  console.log("-check request-");
+  db.query('SELECT * FROM `cats`', (err, results,fields) => {
+    if (err) {
+      console.log(fields);
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({ message: 'success', data: results });
   })
 });
 
-router.put('/user', (req, res) => {
-  res.send('Got a PUT request at /user');
+
+router.post('/cats', (req, res, next) => {
+  const { name, age, breed } = req.body;
+  console.log("Received data:", { name, age, breed });
+  db.query('INSERT INTO cats (name, age, breed) VALUES (?, ?, ?)', [name, age, breed], (err, result) => {
+    if (err) {
+      console.log(err)
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    console.log(result)
+    res.json({ message: 'success', data: { id: result.insertId, name, age, breed } });
+  })
 });
 
-router.delete('/user', (req, res) => {
-  res.send('Got a DELETE request at /user');
+
+router.delete('/cats', (req, res) => {
+  const { id } = req.params;
+
+  if(!id){
+    console.log("id null");
+    res.status(400).json({error:'id is empty'});
+    return;
+  }
+  db.query('DELETE FROM cats WHERE id = ?' , [id], (err,result) =>{
+    if(err){
+      console.error("500err" , err);
+      res.status(500).json({error:"500err"});
+      return;
+    }
+    res.json({ message: 'success', data: result });
+  })
 });
 
 module.exports = router;

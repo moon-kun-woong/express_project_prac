@@ -48,14 +48,21 @@ const connection = mysql.createConnection({
   user: 'root',
   password: '6361427l??',
   database: 'tingting_db'
-})
-connection.connect()
+});
+connection.connect(err => {
+  if(err){
+    console.error('Error connecting to the database:', err);
+    return;
+  }
+  console.log('Connected to the MySQL database.');
+});
+
 
 connection.query('SELECT 1 + 1 AS solution', (err, rows, fields) => {
   if (err) throw err
 
   console.log('The solution is: ', rows[0].solution)
-})
-connection.end()
+});
+connection.end();
 
 module.exports = app;

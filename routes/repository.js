@@ -1,11 +1,11 @@
+// DB 연결
 const mysql = require('mysql')
 const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: 'root',
+  password: '6361427l??',
   database: 'tingting_db'
 })
-
 connection.connect()
 
 connection.query('SELECT 1 + 1 AS solution', (err, rows, fields) => {
@@ -13,5 +13,4 @@ connection.query('SELECT 1 + 1 AS solution', (err, rows, fields) => {
 
   console.log('The solution is: ', rows[0].solution)
 })
-
 connection.end()
