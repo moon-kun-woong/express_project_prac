@@ -61,6 +61,20 @@ router.get('/', function(req, res, next) {
 });
 
 
+router.get('/cats/:id', (req, res) =>{
+  const { id } = req.params;
+  console.log("-check request-" , id);
+  
+  db.query('SELECT * FROM cats WHERE id = ?', [id], (err,results, fields)=>{
+    if (err){
+      console.err(err);
+      res.status(500).json({error: err.message});
+      return;
+    }
+    res.json({ message:'success', data: results});
+  })
+})
+
 router.get('/cats', (req, res, next) => {
   console.log("-check request-");
   db.query('SELECT * FROM `cats`', (err, results,fields) => {
