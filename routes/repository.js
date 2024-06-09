@@ -1,16 +1,16 @@
 // DB 연결
-const mysql = require('mysql')
-const connection = mysql.createConnection({
+const mysql = require('mysql2/promise');
+
+const dbConfig = {
   host: 'localhost',
   user: 'root',
   password: '6361427l??',
   database: 'tingting_db'
-})
-connection.connect()
+};
 
-connection.query('SELECT 1 + 1 AS solution', (err, rows, fields) => {
-  if (err) throw err
+async function dbConnect() {
+  const connection = await mysql.createConnection(dbConfig);
+  return connection;
+}
 
-  console.log('The solution is: ', rows[0].solution)
-})
-connection.end()
+module.exports = dbConnect;

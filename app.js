@@ -41,28 +41,4 @@ app.use(function(err, req, res, next) {
 
 });
 
-// DB 연결
-const mysql = require('mysql')
-const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '6361427l??',
-  database: 'tingting_db'
-});
-connection.connect(err => {
-  if(err){
-    console.error('Error connecting to the database:', err);
-    return;
-  }
-  console.log('Connected to the MySQL database.');
-});
-
-
-connection.query('SELECT 1 + 1 AS solution', (err, rows, fields) => {
-  if (err) throw err
-
-  console.log('The solution is: ', rows[0].solution)
-});
-connection.end();
-
 module.exports = app;
