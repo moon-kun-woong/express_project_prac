@@ -3,69 +3,51 @@ var router = express.Router();
 const dbConnect = require('../routes/repository');
 const db = require('mysql2');
 const bodyParser = require('body-parser');
-const { error } = require('console');
 
 router.use(express.json());
 router.use(bodyParser.json());
 
-
-
+// DB connection
 const connection = db.createConnection({
   host: 'localhost',
   user: 'root',
   password: '6361427l??',
   database: 'tingting_db'
 })
-connection.connect()
+connection.connect();
 
-connection.query('SELECT 1 + 1 AS solution', (err, rows, fields) => {
-  if (err) throw err
-  console.log('The solution is: ', rows[0].solution)
-})
-
-
-// 미들웨어
-const loggingMiddleware = (req , res, next)=>{
-  console.log(`${req.method} 이것이-미들 ${req.url} 웨어`);
+// logging middleware
+const loggingMiddleware = (req, res, next) => {
+  console.log(`request.method : ${req.method} , request.url : ${req.url} `);
   next();
 }
 
-
-//  async 와 sync 의 사용
-let text = "default";
-const data = require("fs").readFileSync("./public/test.txt",{encoding:"utf-8"});
-const data22 = require("fs").readFile("./public/test.txt",{encoding:"utf-8"},(err,data)=>{
-  text = data;
-});
-
+// error check
 router.use((err, req, res, next) => {
   console.error(err.stack)
   res.status(500).send('Something broke!')
 })
 
-
+// check request
 router.use(
   loggingMiddleware,
-  (res,req,next)=>{
-    console.log("Finished Logging...---------");
+  (res, req, next) => {
+    console.log("Finished Logging");
     next();
   }
 );
 
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/', function (req, res, next) {
   res.render('index', { title: '어서와 todoList에..' });
 });
-
-
-
 
 
 // 처음에 작성한 코드
 router.get('/call/cats', (req, res, next) => {
   console.log("-check request-");
-  connection.query('SELECT * FROM `cats`', (err, results,fields) => {
+  connection.query('SELECT * FROM `cats`', (err, results, fields) => {
     if (err) {
       console.log(fields);
       res.status(500).json({ error: err.message });
@@ -75,33 +57,31 @@ router.get('/call/cats', (req, res, next) => {
   })
 });
 
-
 router.post('/call/cats', (req, res, next) => {
   const { name, age, breed } = req.body;
   console.log("Received data:", { name, age, breed });
   connection.query('INSERT INTO cats (name, age, breed) VALUES (?, ?, ?)', [name, age, breed], (err, result) => {
     if (err) {
-        console.log(err);
-        res.status(500).json({ error: err.message });
-        return;
+      console.log(err);
+      res.status(500).json({ error: err.message });
+      return;
     }
     res.json({ message: 'success', data: { id: result.insertId, name, age, breed } })
   });
 });
 
-
 router.delete('/call/cats/:id', (req, res) => {
   const { id } = req.params;
 
-  if(!id){
+  if (!id) {
     console.log("id null");
-    res.status(400).json({error:'id is empty'});
+    res.status(400).json({ error: 'id is empty' });
     return;
   }
-  connection.query('DELETE FROM cats WHERE id = ?' , [id], (err,result) =>{
-    if(err){
-      console.error("500err" , err);
-      res.status(500).json({error:"500err"});
+  connection.query('DELETE FROM cats WHERE id = ?', [id], (err, result) => {
+    if (err) {
+      console.error("500err", err);
+      res.status(500).json({ error: "500err" });
       return;
     }
     res.json({ message: 'success', data: result });
@@ -109,29 +89,27 @@ router.delete('/call/cats/:id', (req, res) => {
 });
 
 
-
 // async await 은 항상 프로미스를 반환. 아래 API 는 프로미스가 반환되게 짜낸 코드임.
-router.get('/cats/:id', async (req, res) =>{
+router.get('/cats/:id', async (req, res) => {
   const { id } = req.params;
-  console.log("-check request- \n id : " , id);
+  console.log("-check request- \n id : ", id);
 
   let connection;
-  
+
   try {
     connection = await dbConnect();
     const [result] = await connection.query('SELECT * FROM cats WHERE id = ?', [id]);
-    res.json({ message:'success', data: result});
+    res.json({ message: 'success', data: result });
     console.log(result);
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({error: err.message});
+    res.status(500).json({ error: err.message });
     return;
 
-  } finally{
+  } finally {
     connection.end();
   }
-
 })
 
 router.get('/cats', async (req, res) => {
@@ -141,19 +119,18 @@ router.get('/cats', async (req, res) => {
   try {
     connection = await dbConnect();
     const [result] = await connection.query('SELECT * FROM `cats`');
-    res.json({message:'success', data: result});
+    res.json({ message: 'success', data: result });
     console.log(result);
-    
+
   } catch (err) {
     console.error(err);
-    res.status(500).json({error: err.message});
+    res.status(500).json({ error: err.message });
     return;
 
   } finally {
     connection.end();
   }
 });
-
 
 router.post('/cats', async (req, res, next) => {
   const { name, age, breed } = req.body;
@@ -181,27 +158,26 @@ router.post('/cats', async (req, res, next) => {
 
 });
 
-
 router.delete('/cats/:id', async (req, res) => {
   const { id } = req.params;
 
   let connection;
 
   try {
-    
-    if(!id){
+
+    if (!id) {
       console.log("id null");
-      res.status(400).json({error:'id is empty'});
+      res.status(400).json({ error: 'id is empty' });
       return;
     }
     connection = await dbConnect();
-    const [result] = await connection.query('DELETE FROM cats WHERE id = ?' , [id]);
+    const [result] = await connection.query('DELETE FROM cats WHERE id = ?', [id]);
     console.log("DELETED: ", id);
     console.log(result);
-    
+
   } catch (err) {
-    console.error("500err" , err);
-    res.status(500).json({error:"500err"});
+    console.error("500err", err);
+    res.status(500).json({ error: "500err" });
     return;
 
   } finally {
