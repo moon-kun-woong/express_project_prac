@@ -4,7 +4,7 @@ const mysql = require('mysql2/promise');
 const dbConfig = {
   host: 'localhost',
   user: 'root',
-  password: '6361427l??',
+  password: '1234',
   database: 'tingting_db'
 };
 
