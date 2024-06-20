@@ -20,7 +20,13 @@ router.get('/cats/:id', async (req, res) => {
     return;
 
   } finally {
-    connection.end();
+    if (connection) {
+      try {
+        await connection.end();
+      } catch (err) {
+        console.error('Error closing the database connection:', err);
+      }
+    }
   }
 })
 
@@ -40,11 +46,10 @@ router.get('/cats', async (req, res) => {
     return;
 
   } finally {
-    connection.end();
   }
 });
 
-router.post('/cats', async (req, res, next) => {
+router.post('/cats', async (req, res) => {
   const { name, age, breed } = req.body;
   console.log("Received data:", { name, age, breed });
 
@@ -64,26 +69,30 @@ router.post('/cats', async (req, res, next) => {
 
   } finally {
     if (connection) {
-      await connection.end();
+      try {
+        await connection.end();
+      } catch (err) {
+        console.error('Error closing the database connection:', err);
+      }
     }
   }
 
 });
 
- router.put('/cats/:id' , async (res, req) =>{
+router.put('/cats/:id', async (res, req) => {
   const { id } = req.params;
 
   let connection;
 
   try {
-    if(!id){
-    console.log("undifind id element.")
-    res.status(400).json({ error: 'undifind Id unaccessed' });
-    return;
+    if (!id) {
+      console.log("undifind id element.")
+      res.status(400).json({ error: 'undifind Id unaccessed' });
+      return;
     }
     connection = await dbConnect();
     const [result] = await connection.query('PUT FROM cats WHERE id=?', [id]);
-    console.log("Put : " , id);
+    console.log("Put : ", id);
     console.log(result);
 
 
@@ -93,10 +102,15 @@ router.post('/cats', async (req, res, next) => {
     return;
 
   } finally {
-    setTimeout=>(console.log("this is async await function logic"), 3000);
+    if (connection) {
+      try {
+        await connection.end();
+      } catch (err) {
+        console.error('Error closing the database connection:', err);
+      }
+    }
   }
-
- })
+})
 
 router.delete('/cats/:id', async (req, res) => {
   const { id } = req.params;
@@ -112,8 +126,9 @@ router.delete('/cats/:id', async (req, res) => {
     }
     connection = await dbConnect();
     const [result] = await connection.query('DELETE FROM cats WHERE id = ?', [id]);
+    res.json({ message: 'success', data: { id } });
+
     console.log("DELETED: ", id);
-    console.log(result);
 
   } catch (err) {
     console.error("500err", err);
@@ -121,7 +136,13 @@ router.delete('/cats/:id', async (req, res) => {
     return;
 
   } finally {
-    connection.end();
+    if (connection) {
+      try {
+        await connection.end();
+      } catch (err) {
+        console.error('Error closing the database connection:', err);
+      }
+    }
   }
 });
 

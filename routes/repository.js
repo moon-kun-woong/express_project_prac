@@ -1,4 +1,4 @@
-// DB 연결
+// Connect DB
 const mysql = require('mysql2/promise');
 
 const dbConfig = {
