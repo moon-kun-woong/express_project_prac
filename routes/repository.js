@@ -1,4 +1,3 @@
-// Connect DB
 const mysql = require('mysql2/promise');
 
 const dbConfig = {
@@ -8,9 +7,8 @@ const dbConfig = {
   database: 'tingting_db'
 };
 
-async function dbConnect() {
-  const connection = await mysql.createConnection(dbConfig);
-  return connection;
+function dbConnect() {
+  return mysql.createConnection(dbConfig)
 }
 
 module.exports = dbConnect;
