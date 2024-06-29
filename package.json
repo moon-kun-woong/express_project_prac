@@ -2,18 +2,30 @@
   "name": "express-project-prac",
   "version": "0.0.0",
   "private": true,
+  "main": "./dist/app.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "npx tsc && nodemon start",
+    "dev": "nodemon app.ts"
   },
   "dependencies": {
     "debug": "~2.6.9",
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "http-errors": "~1.6.3",
-    "morgan": "~1.9.1",
+    "morgan": "~1.10.0",
     "mysql2": "^3.10.0",
+    "nodemon": "^3.1.4",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
-    "nodemon": "^3.1.3"
-  }
+    "@types/dotenv": "^8.2.0",
+    "@types/express": "^4.17.21",
+    "@types/morgan": "^1.9.9",
+    "@types/nodemon": "^1.19.6",
+    "typescript": "^5.5.2"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }

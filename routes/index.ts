@@ -1,7 +1,7 @@
-var express = require('express');
-const dbConnect = require('../routes/repository');
+import express from 'express';
+import dbConnect from './repository';
 
-var router = express.Router();
+const router = express.Router();
 router.get('/cats/:id', async (req, res) => {
   const { id } = req.params;
   console.log("-check request- \n id : ", id);
@@ -16,7 +16,7 @@ router.get('/cats/:id', async (req, res) => {
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err });
     return;
 
   } finally {
@@ -42,7 +42,7 @@ router.get('/cats', async (req, res) => {
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err });
     return;
 
   } finally {
@@ -61,11 +61,11 @@ router.post('/cats', async (req, res) => {
       'INSERT INTO `cats` (name, age, breed) VALUES (?, ?, ?)',
       [name, age, breed]
     );
-    res.json({ message: 'success', data: { id: result.insertId, name, age, breed } });
+    res.json({ message: 'success', data: { id: (result as any).INSERT, name, age, breed } });
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err });
 
   } finally {
     if (connection) {
@@ -79,7 +79,7 @@ router.post('/cats', async (req, res) => {
 
 });
 
-router.put('/cats/:id', async (res, req) => {
+router.put('/cats/:id', async (req, res) => {
   const { id } = req.params;
 
   let connection;
@@ -96,7 +96,7 @@ router.put('/cats/:id', async (res, req) => {
     console.log(result);
 
 
-  } catch (error) {
+  } catch (err) {
     console.error("500err", err);
     res.status(500).json({ error: "500err" });
     return;
@@ -146,4 +146,4 @@ router.delete('/cats/:id', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

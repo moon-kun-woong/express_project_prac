@@ -1,4 +1,4 @@
-const mysql = require('mysql2/promise');
+import mysql2 from 'mysql2/promise';
 
 const dbConfig = {
   host: 'localhost',
@@ -8,7 +8,7 @@ const dbConfig = {
 };
 
 function dbConnect() {
-  return mysql.createConnection(dbConfig)
+  return mysql2.createConnection(dbConfig)
 }
 
-module.exports = dbConnect;
+export default dbConnect;
