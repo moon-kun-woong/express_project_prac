@@ -1,8 +1,8 @@
-import express from 'express';
+import express, { Request, Response, Express, NextFunction } from 'express';
 import dbConnect from './repository';
 
 const router = express.Router();
-router.get('/cats/:id', async (req, res) => {
+router.get('/cats/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
   console.log("-check request- \n id : ", id);
 
@@ -30,7 +30,7 @@ router.get('/cats/:id', async (req, res) => {
   }
 })
 
-router.get('/cats', async (req, res) => {
+router.get('/cats', async (req: Request, res: Response) => {
 
   let connection;
 
@@ -49,7 +49,7 @@ router.get('/cats', async (req, res) => {
   }
 });
 
-router.post('/cats', async (req, res) => {
+router.post('/cats', async (req: Request, res: Response) => {
   const { name, age, breed } = req.body;
   console.log("Received data:", { name, age, breed });
 
@@ -79,7 +79,7 @@ router.post('/cats', async (req, res) => {
 
 });
 
-router.put('/cats/:id', async (req, res) => {
+router.put('/cats/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
 
   let connection;
@@ -112,7 +112,7 @@ router.put('/cats/:id', async (req, res) => {
   }
 })
 
-router.delete('/cats/:id', async (req, res) => {
+router.delete('/cats/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
 
   let connection;
