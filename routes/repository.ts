@@ -1,4 +1,5 @@
 import mysql2 from 'mysql2/promise';
+import { drizzle } from 'drizzle-orm/mysql2';
 
 const dbConfig = {
   host: 'localhost',
@@ -7,8 +8,8 @@ const dbConfig = {
   database: 'tingting_db'
 };
 
-function dbConnect() {
-  return mysql2.createConnection(dbConfig)
+async function dbConnect() {
+  return drizzle(await mysql2.createConnection(dbConfig));
 }
 
 export default dbConnect;
