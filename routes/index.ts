@@ -1,5 +1,7 @@
 import express, { Request, Response, Express, NextFunction } from 'express';
 import dbConnect from './repository';
+import { cats } from './cats'
+import { sql } from 'drizzle-orm';
 
 const router = express.Router();
 router.get('/cats/:id', async (req: Request, res: Response) => {
@@ -10,7 +12,7 @@ router.get('/cats/:id', async (req: Request, res: Response) => {
 
   try {
     connection = await dbConnect();
-    const [result] = await connection.query('SELECT * FROM cats WHERE id = ?', [id]);
+    const result = await connection.select().from(cats).where(sql`id = ${id}`);
     res.json({ message: 'success', data: result });
     console.log(result);
 
@@ -19,14 +21,6 @@ router.get('/cats/:id', async (req: Request, res: Response) => {
     res.status(500).json({ error: err });
     return;
 
-  } finally {
-    if (connection) {
-      try {
-        await connection.end();
-      } catch (err) {
-        console.error('Error closing the database connection:', err);
-      }
-    }
   }
 })
 
@@ -36,7 +30,7 @@ router.get('/cats', async (req: Request, res: Response) => {
 
   try {
     connection = await dbConnect();
-    const [result] = await connection.query('SELECT * FROM `cats`');
+    const result = await connection.select().from(cats);
     res.json({ message: 'success', data: result });
     console.log(result);
 
@@ -45,7 +39,6 @@ router.get('/cats', async (req: Request, res: Response) => {
     res.status(500).json({ error: err });
     return;
 
-  } finally {
   }
 });
 
@@ -57,30 +50,21 @@ router.post('/cats', async (req: Request, res: Response) => {
 
   try {
     connection = await dbConnect();
-    const [result] = await connection.query(
-      'INSERT INTO `cats` (name, age, breed) VALUES (?, ?, ?)',
-      [name, age, breed]
-    );
-    res.json({ message: 'success', data: { id: (result as any).INSERT, name, age, breed } });
+    const [result] = await connection.insert(cats).values([{name, age, breed}]);
+    res.json({ message: 'success', data: { id: (result as any).insertId, name, age, breed } });
+    console.log(result);
 
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err });
 
-  } finally {
-    if (connection) {
-      try {
-        await connection.end();
-      } catch (err) {
-        console.error('Error closing the database connection:', err);
-      }
-    }
   }
 
 });
 
 router.put('/cats/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
+  const { name, age, breed } = req.body;
 
   let connection;
 
@@ -91,24 +75,16 @@ router.put('/cats/:id', async (req: Request, res: Response) => {
       return;
     }
     connection = await dbConnect();
-    const [result] = await connection.query('PUT FROM cats WHERE id=?', [id]);
+    const [result] = await connection.update(cats).set({name, age, breed}).where(sql`id = ${id}`);
+    res.json({ message: 'update', data: { id, name, age, breed } });
     console.log("Put : ", id);
     console.log(result);
-
 
   } catch (err) {
     console.error("500err", err);
     res.status(500).json({ error: "500err" });
     return;
 
-  } finally {
-    if (connection) {
-      try {
-        await connection.end();
-      } catch (err) {
-        console.error('Error closing the database connection:', err);
-      }
-    }
   }
 })
 
@@ -125,24 +101,16 @@ router.delete('/cats/:id', async (req: Request, res: Response) => {
       return;
     }
     connection = await dbConnect();
-    const [result] = await connection.query('DELETE FROM cats WHERE id = ?', [id]);
+    const result = await connection.delete(cats).where(sql`id = ${id}`);
     res.json({ message: 'success', data: { id } });
 
-    console.log("DELETED: ", id);
+    console.log("DELETED: ", result);
 
   } catch (err) {
     console.error("500err", err);
     res.status(500).json({ error: "500err" });
     return;
 
-  } finally {
-    if (connection) {
-      try {
-        await connection.end();
-      } catch (err) {
-        console.error('Error closing the database connection:', err);
-      }
-    }
   }
 });
 
